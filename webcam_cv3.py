@@ -60,9 +60,12 @@ while True:
     cv2.imshow('Video', frame)
     
     if performance_clock == 10: 
+        db = sqlite3.connect("program_performance.db")
         print(str(performance_clock) + str(dt.datetime.now()))
-        con = db.cursor()
-        
+        cur = db.cursor()
+        cur.execute("INSERT INTO performance(time, memory, cpu_usage) VALUES('"+str(dt.datetime.now())+"', '"+ str(psutil.virtual_memory()[2])+"', '"+str(psutil.cpu_percent())+"')")
+        db.commit()
+        db.close()
         performance_clock = 0
     else:
         performance_clock+=1
