@@ -2,6 +2,8 @@ import cv2
 import sys
 import logging as log
 import datetime as dt
+import sqlite3
+import psutil
 from time import sleep
 
 cascPath = "haarcascade_frontalface_default.xml"
@@ -11,6 +13,15 @@ log.basicConfig(filename='webcam.log',level=log.INFO)
 video_capture = cv2.VideoCapture(0)
 anterior = 0
 
+try:
+    db = sqlite3.connect("program_performance.db")
+except Exception as e:
+    print(e)
+
+performance_clock = 0
+num_of_entries = 0
+entries = []
+    
 while True:
     if not video_capture.isOpened():
         print('Unable to load camera.')
@@ -47,7 +58,15 @@ while True:
 
     # Display the resulting frame
     cv2.imshow('Video', frame)
-
+    
+    if performance_clock == 10: 
+        print(str(performance_clock) + str(dt.datetime.now()))
+        con = db.cursor()
+        
+        performance_clock = 0
+    else:
+        performance_clock+=1
+ 
 # When everything is done, release the capture
 video_capture.release()
 cv2.destroyAllWindows()
